@@ -1,6 +1,7 @@
 package pyroclastic.tests
 
 import mercator._
+import language.implicitConversions
 
 object Test extends App {
 
@@ -20,7 +21,7 @@ object Test extends App {
   object Cup {
     case class Spillage() extends Exception("whoops")
     
-    def pour[T](water: Water, milk: Milk, other: T): Cup[T] =
+    def pour[T](water: Water, milk: Milk, other: T): Try[Cup[T]] =
       if(math.random < 0.9) Success(Cup(water, milk, other)) else Failure(Spillage())
   }
   
@@ -39,13 +40,13 @@ object Test extends App {
   val buyMilk = milk.of(Milk())
   val buyTeabag = teabag.of(Tea())
 
-  val boilWater = given(coldWater, kettle).propagate(hotWater) { coldWater().boil() }
+  val boilWater = given(coldWater, kettle).propagate(hotWater) { implicit env => coldWater().boil() }
   
-  val pourTea = given(milk, hotWater, teabag).propagate(tea) {
+  val pourTea = given(milk, hotWater, teabag).propagate(tea) { implicit env =>
     Cup.pour(hotWater(), milk(), teabag())
   }
 
-  val pourCoffee = given(milk, hotWater, groundCoffee).propagate(coffee) {
+  val pourCoffee = given(milk, hotWater, groundCoffee).propagate(coffee) { implicit env =>
     Cup.pour(hotWater(), milk(), groundCoffee())
   }
 

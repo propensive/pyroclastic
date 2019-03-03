@@ -32,12 +32,12 @@ class Domain[M[_]]()(implicit monadic: Monadic[M]) {
     new GivenFields(xs.map(_.field))
 
   class GivenFields[In <: BaseKey](keys: Seq[BaseKey]) {
-    def propagate(key: BaseKey)(action: implicit Env[In] => M[key.Type]): Flow[In, In with key.type] =
+    def propagate(key: BaseKey)(action: Env[_ <: In] => M[key.Type]): Flow[In, In with key.type] =
       new Flow(key, { in =>
         in.updated(key, keys.map { k => in(k).map(k -> _) }.sequence.flatMap { seq => action(Env(seq.toMap)).asInstanceOf[M[Any]] })
       })
     
-    def provide(key: BaseKey)(action: implicit Env[In] => key.Type): Flow[In, In with key.type] =
+    def provide(key: BaseKey)(action: Env[_ <: In] => key.Type): Flow[In, In with key.type] =
       new Flow(key, { in =>
         in.updated(key, keys.map { key => in(key).map(key -> _) }.sequence.flatMap { seq => monadic.point(action(Env(seq.toMap))).asInstanceOf[M[Any]] })
       })

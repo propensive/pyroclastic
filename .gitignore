@@ -1,0 +1,14 @@
+*.class
+*.log
+*.swp
+*.swo
+.bloop/
+.fury
+.idea
+*~
+**/#*
+**/.#*
+log
+project
+target
+lib
