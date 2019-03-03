@@ -1,8 +1,6 @@
 package pyroclastic
 
 import mercator._
-import mitigation._
-import totalitarian.Base
 
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -59,25 +57,3 @@ case class Flow[M[_], In <: BaseKey, Out <: BaseKey]
 
 object Need { implicit def toNeed[T <: BaseKey](t: T): Need[t.type] = Need(t) }
 case class Need[-T <: BaseKey](value: T @uv)
-
-object Test {
-
-    import scala.util._
-
-    val a = Value[String]()
-    val b = Value[String]()
-    val c = Value[Int]()
-    val d = Value[Double]()
-
-    val hello = a of { Try("Hello world") }
-
-    val exclaim = given(a).propagate(b).as { implicit env => Try(a()+"!") }
-    val point = given(a).propagate(b).as { implicit env => Try(a()+".") }
-    val getLength = given(b).propagate(c).as { implicit env => Try(b().length) }
-
-    val thing = exclaim >>> getLength
-
-    val mkExclaim = hello >>> thing
-  
-    def attempt = println(mkExclaim(c).map(_ + 1))
-}
