@@ -40,7 +40,7 @@ object Test extends App {
   val buyMilk = milk.of(Milk())
   val buyTeabag = teabag.of(Tea())
 
-  val boilWater = given(coldWater, kettle).propagate(hotWater) { implicit env => coldWater().boil() }
+  val boilWater = given(coldWater, kettle).propagate(hotWater) { implicit env => println("boiling..."); coldWater().boil() }
   
   val pourTea = given(milk, hotWater, teabag).propagate(tea) { implicit env =>
     Cup.pour(hotWater(), milk(), teabag())
@@ -52,9 +52,13 @@ object Test extends App {
 
   val preparation = getKettle >>> getWater >>> buyMilk >>> boilWater 
 
-  val teaRound = buyTeabag >>> preparation >>> pourTea
+  val teaRound = buyTeabag >>> preparation >>> boilWater >>> pourTea
   val coffeeRound = grindCoffee >>> preparation >>> pourCoffee
 
   val myTea = teaRound(tea)
   val myCoffee: Try[Cup[Coffee]] = coffeeRound(coffee)
+
+  println(myTea)
+  println(myCoffee)
+  sys.exit(1)
 }
