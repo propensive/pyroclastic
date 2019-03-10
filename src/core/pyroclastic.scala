@@ -39,14 +39,10 @@ class Domain[M[_]]()(implicit monadic: Monadic[M]) {
         in.updated(key, result)
       })
     
-    def propagate(key1: BaseKey, key2: BaseKey)(action: Env[_ <: In] => (M[key1.Type], M[key2.Type])): Flow[In, In with key1.type with key2.type] =
+    def propagate(key1: BaseKey, key2: BaseKey)(action: Env[_ <: In] => M[(key1.Type, key2.Type)]): Flow[In, In with key1.type with key2.type] =
       new Flow({ in =>
         val input = keys.map { k => in(k).map(k -> _) }.sequence
-        val result = input.flatMap { seq =>
-          val (a, b) = action(Env(seq.toMap))
-          a.flatMap { a => b.map((a, _)) }
-        }.asInstanceOf[M[(Any, Any)]]
-        
+        val result = input.flatMap { seq => action(Env(seq.toMap)).asInstanceOf[M[(Any, Any)]] }
         in.updated(key1, result.map(_._1)).updated(key2, result.map(_._2))
       })
     
@@ -54,7 +50,7 @@ class Domain[M[_]]()(implicit monadic: Monadic[M]) {
       propagate(key)(action.andThen(monadic.point(_)))
     
     def provide(key1: BaseKey, key2: BaseKey)(action: Env[_ <: In] => (key1.Type, key2.Type)): Flow[In, In with key1.type with key2.type] =
-      propagate(key1, key2)(action.andThen { case (a, b) => (monadic.point(a), monadic.point(b)) })
+      propagate(key1, key2)(action.andThen { case (a, b) => monadic.point((a, b)) })
   }
 
   case class Env[+In <: BaseKey](fields: Map[BaseKey, Any])

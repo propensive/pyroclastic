@@ -46,7 +46,7 @@ object Test extends App {
   val boilWater = given(coldWater, kettle).propagate(hotWater) { implicit env => println("boiling..."); coldWater().boil() }
   
   val pourTea = given(milk, hotWater, teabag).propagate(tea, oldTeabag) { implicit env =>
-    (Cup.pour(hotWater(), milk(), teabag()), Try(Teabag()))
+    Cup.pour(hotWater(), milk(), teabag()).map((_, Teabag()))
   }
 
   val pourCoffee = given(milk, hotWater, groundCoffee).propagate(coffee) { implicit env =>
