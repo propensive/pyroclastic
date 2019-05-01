@@ -1,4 +1,4 @@
 [submodule "mercator"]
 	path = mercator
-	url = git@github.com:propensive/mercator.git
+	url = https://github.com/propensive/mercator.git
 	branch = fury
