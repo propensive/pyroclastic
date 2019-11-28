@@ -1,6 +1,6 @@
 PROJECT = pyroclastic
 DEPENDENCIES = lib/mercator.jar
-MODULES = core
+MODULES = core example
 
 lib/$(PROJECT).jar: lib compile
 	jar -cf lib/$(PROJECT).jar -C bin $(PROJECT)
