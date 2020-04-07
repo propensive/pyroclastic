@@ -1,14 +1,4 @@
-*.class
-*.log
-*.swp
-*.swo
-.bloop/
+.bloop
+.bsp
 .fury
-.idea
-*~
-**/#*
-**/.#*
-log
-project
-target
-lib
+.done
