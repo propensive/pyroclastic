@@ -16,6 +16,7 @@ object Test extends App {
   case class Water(hot: Boolean) { def boil(): Try[Water] = Success(Water(true)) }
   case class Kettle()
   case class Coffee()
+  case class Teabag()
   
   case class Cup[T](water: Water, milk: Milk, other: T)
   object Cup {
@@ -34,6 +35,8 @@ object Test extends App {
   val groundCoffee = Field[Coffee]()
   val coffee = Field[Cup[Coffee]]()
 
+  val oldTeabag = Field[Teabag]()
+
   val getKettle = kettle.of(Kettle())
   val getWater = coldWater.of(Water(false))
   val grindCoffee = groundCoffee.of(Coffee())
@@ -42,8 +45,8 @@ object Test extends App {
 
   val boilWater = given(coldWater, kettle).propagate(hotWater) { implicit env => println("boiling..."); coldWater().boil() }
   
-  val pourTea = given(milk, hotWater, teabag).propagate(tea) { implicit env =>
-    Cup.pour(hotWater(), milk(), teabag())
+  val pourTea = given(milk, hotWater, teabag).propagate(tea, oldTeabag) { implicit env =>
+    Cup.pour(hotWater(), milk(), teabag()).map((_, Teabag()))
   }
 
   val pourCoffee = given(milk, hotWater, groundCoffee).propagate(coffee) { implicit env =>
@@ -56,9 +59,11 @@ object Test extends App {
   val coffeeRound = grindCoffee >>> preparation >>> pourCoffee
 
   val myTea = teaRound(tea)
+  val myTeabag = teaRound(teabag)
   val myCoffee: Try[Cup[Coffee]] = coffeeRound(coffee)
 
   println(myTea)
+  println(myTeabag)
   println(myCoffee)
   sys.exit(1)
 }
