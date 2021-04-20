@@ -8,7 +8,10 @@
 *~
 **/#*
 **/.#*
-log
+tmp/
 project
 target
-lib
+.bsp
+.metals/
+.*.bak
+.vscode/
